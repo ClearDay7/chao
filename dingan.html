@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+
+	</head>
+
+	<body>
+		<div class="container-fluid" id="vmlist">
+
+			<div class="row">
+				<div class="row">
+					<div class="col-md-12 img-rounded" style="border: 1px solid rgb(225,225,225);">
+						<span>您现在所在的位置是：</span>
+						<span style="color: rgb(108,134,175);" id="nd"></span>
+					</div>
+				</div>
+				<div class="row" style="background-color: rgb(246,250,253);">
+					<div class="col-md-12">
+						<form>
+							<div class="form-group" style="padding-top: 10px;">
+								<span>供应商编码：</span>
+								<input type="text" v-model="gysid" class="form-control" style="display: inline-block; width: 20%;" />
+								<span>供应商名称：</span>
+								<input type="text" v-model="gysname" class="form-control" style="display: inline-block; width: 20%;" />
+								<input type="button" class="btn btn-success " @click="sdas" value="查询" />
+								<input type="button" class="btn btn-success pull-right" id="addBtn" onclick="oaa()" value="添加供应商" />
+								<div class="modal fade" style="top:13%;" tabindex="-1" role="dialog" id="showModal">
+
+									<div class="modal-dialog" role="document">
+
+										<div class="modal-content">
+
+											<!-- 内容会加载到这里 -->
+
+										</div>
+
+									</div>
+									<!-- /.modal-content -->
+
+								</div>
+								<!-- /.modal-dialog -->
+
+							</div>
+							<!-- /.modal -->
+					</div>
+				</div>
+				<!-- 弹出模态窗口-->
+			</div>
+			</form>
+
+			<div class="row">
+				<div class="col-md-12">
+					<table class="table table-bordered text-center">
+						<thead>
+							<tr style="background: rgb(246,247,249);">
+								<th class="text-center">供应商编码</th>
+								<th class="text-center">供应商名称</th>
+								<th class="text-center">联系人</th>
+								<th class="text-center">联系电话</th>
+								<th class="text-center">传真</th>
+								<th class="text-center">创建时间</th>
+								<th class="text-center">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+
+							<tr v-for="(t,i) in tt">
+								<td>{{t.gysbm}}</td>
+								<td>{{t.gysarr}}</td>
+								<td>{{t.phoneName}}</td>
+								<td>{{t.phone}}</td>
+								<td>{{t.cz}}</td>
+								<td>{{t.gdate}}</td>
+								<td>
+									<a href="javaScript:void(0)"><img src="img/read.png" /></a>
+									<a href="javaScript:void(0)" @click="del(i,t.gysbm)"><img src="img/schu.png" /></a>
+									<a href="javaScript:void(0)" @click="hq(t.gysbm)"><img src="img/xiugai.png" /></a>
+								</td>
+							</tr>
+
+						</tbody>
+
+					</table>
+					<nav>
+						<ul class="pagination">
+							<li>
+								<a href="#" aria-label="Previous" @click="FirstPage">
+									<span aria-hidden="true">首页</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" aria-label="Previous"  @click="prePage">
+									<span aria-hidden="true">&laquo;</span>
+								</a>
+							</li>
+
+							<li>
+								<a href="#" aria-label="Next" @click="nextPage">
+									<span aria-hidden="true">&raquo;</span>
+								</a>
+							</li>
+							<li>
+								<a href="#" aria-label="Next" @click="LastPage">
+									<span aria-hidden="true">末页</span>
+								</a>
+							</li>
+						</ul>
+					</nav>
+					<div>
+						<span >单前页数{{current}}</span>
+					</br>
+											<span>总页数{{yeshu}}</span>
+<br />
+						<span>总数据{{zong}}</span>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</body>
+	<script>
+		function oaa() {
+			showWindowDialog('iner.html', '注册');
+		}
+		var vmList = new Vue({
+			el: "#vmlist",
+			data: {
+				gysid: '',
+				gysname: '',
+				zong:"",
+				current:"",
+				yeshu:"",
+				gdept: {
+					gysbm: '',
+					gysarr: '',
+					phoneName: '',
+					phone: '',
+					cz: '',
+					gdate: ''
+				},
+				tt: {}
+			},
+			mounted() {
+				this.page(1, 3,this.gysid,this.gysname);
+			},
+			methods: {
+				page(p,s,g,y) {
+					let _this = this;
+					
+					if(g==null || g=='undefined'||g==''){
+						g='undefined';
+					} 
+					
+					if(y==null || y=="undefined"||y==''){
+						y="undefined";
+					}
+					$.getJSON("http://localhost:8080/api/ni/" + p + "/" + s+"/"+g+"/"+y, function(t) {
+						console.info(t)
+						_this.tt = t.records;
+						_this.zong=t.total;
+						_this.current=t.current;
+						_this.yeshu=t.pages;
+						
+					});
+				},
+				FirstPage() {
+
+					this.page(1,1,"1","1");
+				},
+				LastPage() {
+						this.page(this.yeshu,1,"1","1");									
+				},
+				prePage() {
+	                 if(this.current>=1){
+						this.current--;
+						this.page(this.current,1,"1","1");
+					}	
+				},
+				nextPage() {
+						if(this.current<=this.yeshu){
+						this.current++;
+						this.page(this.current,1,"1","1");
+					}	
+				},
+				hq(val) {
+					window.sessionStorage.setItem("id", val);
+					showWindowDialog("update.html", "修改");
+				},
+				del(i, val) {
+					console.info(this.tt.splice(i, 1));
+					if(confirm("确实要删除吗?")) {
+						this.dga(val);
+						
+					}
+				},
+				dga(val) {
+					let _this = this;
+					$.ajax("http://localhost:8080/api/ni/"+val, {
+						type: "delete",
+						success(js) {
+							if(js.code == "200") {
+								showAlertDialog("删除成功");
+								_this.page(1, _this.tt.pageSize ,_this.gysid,_this.gysname);
+							} else {
+								showAlertDialog("删除失败");
+							}
+						}
+					})
+
+				},sdas(){
+					this.page(1, 1 ,this.gysid,this.gysname);
+				}
+			}
+		});
+
+		$(function() {
+			$("#nd").text($.cookie("name"));
+			$.removeCookie('name', {
+				domain: '127.0.0.1',
+				path: '/'
+			});
+
+			$("#addBtn").click(function() {
+				showWindowDialog("puls.html");
+			});
+
+		})
+	</script>
+
+</html>

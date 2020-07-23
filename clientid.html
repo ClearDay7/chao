@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+	</head>
+	<body>
+		<div id="app">
+			
+	
+		<div class="container">
+			<div class="row">
+				<div class="col-md-1">
+					客户编号
+				</div>
+				<div class="col-md-2">
+					<input v-model="khid" />
+				</div>
+					<div class="col-md-1">
+					客户名称
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.clientname" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-1">
+					联系人
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.lxr"/>
+				</div>
+					<div class="col-md-1">
+					创建时间
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.cdate"/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-1">
+					联系电话
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.lxdh" />
+				</div>
+					<div class="col-md-1">
+					送货地址
+				</div>
+				<div class="col-md-1">
+					<input v-model="address.addressid"/>
+				</div>
+				<div class="col-md-2">
+					<input v-model="address.addressname"/>
+				</div>
+			</div>
+				<div class="row">
+				<div class="col-md-1">
+					负责人
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.fuzeren" />
+				</div>
+					<div class="col-md-1">
+					bian
+				</div>
+				<div class="col-md-2">
+					<input v-model="kh.djhao" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-4 col-md-push-2">
+					<button class="btn btn-success" @click="cha">查询</button>
+				</div>
+				<div class="col-md-6">
+					<button class="btn btn-primary" @click="save">保存</button>
+				</div>
+			</div>
+		</div>
+			</div>
+	</body>
+	<script type="text/javascript" src="js/jquery-1.12.4.js" ></script>
+	<script type="text/javascript" src="js/vue.js" ></script>
+	<script>
+			var vmList = new Vue({
+			el:"#app",
+			data:{
+				khid:"",
+				kh:{},
+				address:{}
+			},
+			methods:{
+				cha(){
+					let _this=this;
+					$.getJSON("http://localhost:2345/cha?khid="+_this.khid, function(mess) {
+						console.info(mess)
+						_this.kh=mess;
+						_this.address=mess.address;
+					})
+				},save(){
+					let _this=this;
+				$.ajax({					    
+						url:"http://127.0.0.1:2345/insert?id="+_this.khid,
+						type: "post",
+						contentType: "application/json",
+						data: JSON.stringify(_this.kh),
+						dataType: "json",
+						success(meg){
+						}
+						})
+				}
+			}
+			})
+		
+	</script>
+</html>
